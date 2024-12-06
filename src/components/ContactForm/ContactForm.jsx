@@ -1,9 +1,9 @@
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
-import { useDispatch, useSelector } from 'react-redux';
-import { addContact } from '../../redux/operations';
-import { selectContacts } from '../../redux/contactsSlice';
-import s from './ContactForm.module.css';
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { useDispatch, useSelector } from "react-redux";
+import { addContact } from "../../redux/operations";
+import { selectContacts } from "../../redux/selectors";
+import s from "./ContactForm.module.css";
 
 const ContactForm = () => {
   const dispatch = useDispatch();
@@ -11,19 +11,19 @@ const ContactForm = () => {
 
   const orderSchema = Yup.object({
     name: Yup.string()
-      .min(3, 'Minimum 3 characters')
-      .max(50, 'Maximum 50 characters')
-      .required('Must be filled'),
+      .min(3, "Minimum 3 characters")
+      .max(50, "Maximum 50 characters")
+      .required("Must be filled"),
     number: Yup.string()
-      .matches(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number')
-      .min(3, 'Minimum 3 digits')
-      .max(50, 'Maximum 50 digits')
-      .required('Must be filled'),
+      .matches(/^\+?[1-9]\d{1,14}$/, "Invalid phone number")
+      .min(3, "Minimum 3 digits")
+      .max(50, "Maximum 50 digits")
+      .required("Must be filled"),
   });
 
   const initialValues = {
-    name: '',
-    number: '',
+    name: "",
+    number: "",
   };
 
   const handleSubmit = (values, { resetForm }) => {
@@ -35,7 +35,7 @@ const ContactForm = () => {
     );
 
     if (isDuplicate) {
-      alert('This contact already exists!');
+      alert("This contact already exists!");
       return;
     }
 
