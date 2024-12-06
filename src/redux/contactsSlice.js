@@ -1,28 +1,61 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, isAnyOf } from "@reduxjs/toolkit";
+import { createSelector } from "@reduxjs/toolkit";
+import { fetchContacts, addContact, deleteContact } from "./operations";
 
 const initialState = {
-
   items: [],
+  isLoading: false,
+  error: null,
 };
 
 const contactsSlice = createSlice({
-  name: 'contacts',
+  name: "contacts",
   initialState,
-  reducers: {
-    addContact: (state, action) => {
-      state.items.push(action.payload);
-    },
-    deleteContact: (state, action) => {
-      state.items = state.items.filter(item => item.id !== action.payload);
-    },
+  extraReducers: (builder) => {
+    builder
+
+      .addCase(fetchContacts.fulfilled, (state, { payload }) => {
+        state.items = payload;
+      })
+      .addCase(deleteContact.fulfilled, (state, { payload }) => {
+        state.items = state.items.filter((item) => item.id !== payload.id);
+      })
+      .addCase(addContact.fulfilled, (state, { payload }) => {
+        state.items.push(payload);
+      })
+      .addMatcher(
+        isAnyOf(
+          fetchContacts.fulfilled,
+          addContact.fulfilled,
+          deleteContact.fulfilled
+        ),
+        (state) => {
+          state.isLoading = false;
+        }
+      )
+      .addMatcher(
+        isAnyOf(
+          fetchContacts.pending,
+          addContact.pending,
+          deleteContact.pending
+        ),
+        (state) => {
+          state.isLoading = true;
+          state.error = null;
+        }
+      )
+      .addMatcher(
+        isAnyOf(
+          fetchContacts.rejected,
+          addContact.rejected,
+          deleteContact.rejected
+        ),
+        (state, action) => {
+          state.isLoading = false;
+          state.error = action.payload || "Something went wrong";
+        }
+      );
   },
 });
 
-// Селектор для отримання списку контактів
-export const selectContacts = state => state.contacts.items;
-
-// Експорт редюсера
 export const contactsReducer = contactsSlice.reducer;
-
-// Експорт екшенів
-export const { addContact, deleteContact } = contactsSlice.actions;
